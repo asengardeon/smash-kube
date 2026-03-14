@@ -47,11 +47,11 @@ describe('ipcHandlers', () => {
   });
 
   test('list-eks-clusters handler should call awsService.listEksClusters', async () => {
-    const mockArgs = { profile: 'p', region: 'r' };
+    const mockArgs = { profile: 'p', region: 'r', ssoUrl: 'u' };
     awsService.listEksClusters.mockResolvedValue(['c1']);
     
     const result = await handlers['list-eks-clusters']({}, mockArgs);
-    expect(awsService.listEksClusters).toHaveBeenCalledWith('p', 'r');
+    expect(awsService.listEksClusters).toHaveBeenCalledWith({ profile: 'p', region: 'r', ssoUrl: 'u' });
     expect(result).toEqual(['c1']);
   });
 
