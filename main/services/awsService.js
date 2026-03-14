@@ -37,6 +37,11 @@ class AwsService {
    * @param {Object} cluster - Cluster configuration object.
    */
   async updateKubeconfig(cluster) {
+    if (process.env.DEMO_MODE === 'true' && cluster.name === 'demonstracao') {
+      console.log('[DEMO] Skipping real updateKubeconfig for demo cluster');
+      return "Using DEMO MODE for cluster: demonstracao";
+    }
+
     const { name, region, profile, accessKeyId, secretAccessKey, sessionToken, ssoUrl } = cluster;
     const finalRegion = region || 'us-east-1';
     

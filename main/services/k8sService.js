@@ -102,6 +102,14 @@ class K8sService {
   }
 
   async executeMethod(method, args) {
+    // --- MODO DEMO (FAKE DATA) PARA PRINTS ---
+    const isDemo = process.env.DEMO_MODE === 'true';
+    if (isDemo) {
+      console.log(`[DEMO] Mocking method: ${method}`);
+      return this.getFakeData(method, args);
+    }
+    // -----------------------------------------
+
     const k8sApi = this.getApiClient(k8s.CoreV1Api);
     const appsApi = this.getApiClient(k8s.AppsV1Api);
     const networkingApi = this.getApiClient(k8s.NetworkingV1Api);
@@ -186,6 +194,55 @@ class K8sService {
     output += `Spec:\n${JSON.stringify(resourceData.spec, null, 2)}\n\n`;
     output += `Status:\n${JSON.stringify(resourceData.status, null, 2)}\n`;
     return output;
+  }
+
+  getFakeData(method, args) {
+    const ns = args?.namespace && args.namespace !== 'all' ? args.namespace : 'default';
+    const uid = () => Math.random().toString(36).substring(2, 15);
+    const date = new Date().toISOString();
+
+    switch (method) {
+      case 'listNamespaces':
+        return { items: [
+          { metadata: { name: 'default' } },
+          { metadata: { name: 'kube-system' } },
+          { metadata: { name: 'production' } },
+          { metadata: { name: 'staging' } },
+          { metadata: { name: 'monitoring' } }
+        ]};
+      case 'listPods':
+        return { items: [
+          { metadata: { name: 'api-gateway-7f8d9b-x2k4', namespace: ns, uid: uid(), creationTimestamp: date }, status: { phase: 'Running', containerStatuses: [{ restartCount: 0, state: { running: {} } }] } },
+          { metadata: { name: 'auth-service-5d4c3b-m9n1', namespace: ns, uid: uid(), creationTimestamp: date }, status: { phase: 'Running', containerStatuses: [{ restartCount: 2, state: { running: {} } }] } },
+          { metadata: { name: 'payment-worker-88a2f-p0q8', namespace: ns, uid: uid(), creationTimestamp: date }, status: { phase: 'Pending', containerStatuses: [{ restartCount: 0, state: { waiting: { reason: 'ContainerCreating' } } }] } },
+          { metadata: { name: 'redis-master-0', namespace: ns, uid: uid(), creationTimestamp: date }, status: { phase: 'Running', containerStatuses: [{ restartCount: 0, state: { running: {} } }] } }
+        ]};
+      case 'listDeployments':
+        return { items: [
+          { metadata: { name: 'api-gateway', namespace: ns, uid: uid(), creationTimestamp: date }, spec: { replicas: 3 }, status: { availableReplicas: 3, readyReplicas: 3, updatedReplicas: 3, conditions: [{ type: 'Available', status: 'True' }] } },
+          { metadata: { name: 'auth-service', namespace: ns, uid: uid(), creationTimestamp: date }, spec: { replicas: 2 }, status: { availableReplicas: 2, readyReplicas: 2, updatedReplicas: 2, conditions: [{ type: 'Available', status: 'True' }] } }
+        ]};
+      case 'listServices':
+        return { items: [
+          { metadata: { name: 'api-gateway', namespace: ns, uid: uid(), creationTimestamp: date }, spec: { type: 'LoadBalancer', clusterIP: '10.100.0.1' }, status: { loadBalancer: { ingress: [{ hostname: 'a1b2c3d4.us-east-1.elb.amazonaws.com' }] } } },
+          { metadata: { name: 'redis', namespace: ns, uid: uid(), creationTimestamp: date }, spec: { type: 'ClusterIP', clusterIP: '10.100.55.21' } }
+        ]};
+      case 'listNodes':
+        return { items: [
+          { metadata: { name: 'ip-192-168-10-1.ec2.internal', uid: uid(), creationTimestamp: date }, status: { capacity: { cpu: '4', memory: '16Gi' }, conditions: [{ type: 'Ready', status: 'True' }] } },
+          { metadata: { name: 'ip-192-168-10-2.ec2.internal', uid: uid(), creationTimestamp: date }, status: { capacity: { cpu: '4', memory: '16Gi' }, conditions: [{ type: 'Ready', status: 'True' }] } }
+        ]};
+      case 'getPodLogs':
+        return `[2024-03-14 10:00:01] INFO: Starting API Gateway...
+[2024-03-14 10:00:05] INFO: Connected to Redis at 10.100.55.21:6379
+[2024-03-14 10:00:10] DEBUG: Initializing authentication middleware
+[2024-03-14 10:05:22] WARN: Latency spike detected on /v1/auth endpoint
+[2024-03-14 10:10:00] INFO: Health check passed. Status: OK`;
+      case 'describeResource':
+        return `Name: \t\t${args.name}\nNamespace: \t${args.namespace}\nLabels: \tapp=${args.name}, env=production\nAPI Version: \tv1\nKind: \t\t${args.kind}\nCreation: \t${date}\n------------------------------------------------------------\n\nSpec:\n{\n  "replicas": 3,\n  "selector": {\n    "matchLabels": {\n      "app": "${args.name}"\n    }\n  }\n}\n\nStatus:\n{\n  "availableReplicas": 3,\n  "readyReplicas": 3\n}`;
+      default:
+        return { items: [] };
+    }
   }
 }
 
