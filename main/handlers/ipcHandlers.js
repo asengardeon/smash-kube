@@ -20,6 +20,10 @@ function registerIpcHandlers() {
   });
 
   ipcMain.handle('update-kubeconfig', async (event, cluster) => {
+    if (cluster.authMethod === 'local') {
+      k8sService.resetConfig();
+      return "Using local kubeconfig";
+    }
     const result = await awsService.updateKubeconfig(cluster);
     k8sService.resetConfig();
     return result;

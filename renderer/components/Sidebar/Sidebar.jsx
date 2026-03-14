@@ -75,7 +75,9 @@ export const Sidebar = ({
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-white truncate">{cluster.name}</p>
-                  <p className="text-xs text-gray-500 truncate">{cluster.region} / {cluster.profile}</p>
+                  <p className="text-xs text-gray-500 truncate">
+                    {cluster.authMethod === 'local' ? 'Kubeconfig Local' : `${cluster.region} / ${cluster.profile}`}
+                  </p>
                 </div>
               </div>
               <div className="absolute right-2 top-2 hidden group-hover:flex items-center gap-1 bg-gray-900 shadow-xl p-1 rounded-md border border-gray-700">

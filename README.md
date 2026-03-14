@@ -16,6 +16,7 @@ Este é um projeto **Open Source**. Contribuições são muito bem-vindas! Veja 
 - **Autenticação Flexível**:
   - Suporte total a **AWS SSO (IAM Identity Center)** via perfis do AWS CLI.
   - Suporte a credenciais manuais (Access Key, Secret Key e Session Token) para conexões temporárias.
+  - Suporte a **Kubeconfig Local** (padrão ou caminho customizado).
 - **Visualização de Recursos**:
   - **Workloads**: Pods, Deployments, StatefulSets, DaemonSets, Jobs, CronJobs e HPAs.
   - **Rede**: Services, Ingresses e Endpoints.
@@ -31,7 +32,26 @@ Este é um projeto **Open Source**. Contribuições são muito bem-vindas! Veja 
 ## 📸 Guia de Uso Visual
 
 ### 1. Adicionando um Cluster
-Abra o modal de adição de cluster e escolha entre o método **AWS SSO** ou **Manual Keys**.
+Abra o modal de adição de cluster clicando no botão **"+"** na barra lateral. O Smash Kube oferece três formas de conexão:
+
+#### A. AWS SSO (Recomendado para EKS)
+Ideal para empresas que utilizam o IAM Identity Center.
+- **AWS Profile**: O nome do perfil configurado no seu `~/.aws/config`.
+- **AWS Region**: A região onde o cluster EKS está localizado.
+- **SSO Start URL (Opcional)**: Caso precise disparar o login automático.
+
+#### B. Manual Keys (Credenciais Temporárias)
+Útil para sessões rápidas com tokens de curta duração.
+- **Access Key ID**, **Secret Access Key** e **Session Token**.
+
+#### C. Kubeconfig Local
+Permite usar contextos já configurados na sua máquina (EKS, Minikube, Kind, etc).
+- **Caminho do Kubeconfig (Opcional)**: Se deixado em branco, utiliza o padrão `~/.kube/config`. Caso contrário, informe o caminho completo para o arquivo.
+
+> **Dica:** Para obter o arquivo de configuração de um cluster EKS via terminal, você pode executar:
+> ```bash
+> aws eks update-kubeconfig --name <NOME_CLUSTER> --region <REGIAO> --profile <PROFILE>
+> ```
 
 ![Adicionar Cluster](assets/screenshots/add-cluster.png)
 

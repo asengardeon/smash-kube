@@ -14,7 +14,12 @@ class K8sService {
     console.log('[K8sService] Loading configuration...');
     this.kubeConfig = new k8s.KubeConfig();
     try {
-      this.kubeConfig.loadFromDefault();
+      if (cluster && cluster.authMethod === 'local' && cluster.kubeconfigPath) {
+        console.log(`[K8sService] Loading custom kubeconfig: ${cluster.kubeconfigPath}`);
+        this.kubeConfig.loadFromFile(cluster.kubeconfigPath);
+      } else {
+        this.kubeConfig.loadFromDefault();
+      }
       
       if (this.isManualAuth(cluster)) {
         this.applyManualAuth(cluster);
@@ -30,7 +35,7 @@ class K8sService {
   }
 
   isManualAuth(cluster) {
-    return !!(cluster && cluster.accessKeyId && cluster.secretAccessKey && cluster.sessionToken);
+    return !!(cluster && cluster.authMethod === 'manual' && cluster.accessKeyId && cluster.secretAccessKey && cluster.sessionToken);
   }
 
   applyManualAuth(cluster) {

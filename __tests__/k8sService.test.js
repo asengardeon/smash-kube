@@ -5,6 +5,7 @@ jest.mock('@kubernetes/client-node', () => {
   return {
     KubeConfig: jest.fn().mockImplementation(() => ({
       loadFromDefault: jest.fn(),
+      loadFromFile: jest.fn(),
       makeApiClient: jest.fn(),
       users: [{ user: { name: 'user' } }]
     })),
@@ -28,14 +29,23 @@ describe('K8sService', () => {
     expect(config.loadFromDefault).toHaveBeenCalled();
   });
 
+  test('loadConfig should load from custom file for local auth', () => {
+    const cluster = { authMethod: 'local', kubeconfigPath: '/path/to/config' };
+    const config = k8sService.loadConfig(cluster);
+    expect(config.loadFromFile).toHaveBeenCalledWith('/path/to/config');
+    expect(config.loadFromDefault).not.toHaveBeenCalled();
+  });
+
   test('isManualAuth should detect manual credentials', () => {
     const manualCluster = {
+      authMethod: 'manual',
       accessKeyId: 'key',
       secretAccessKey: 'secret',
       sessionToken: 'token'
     };
     expect(k8sService.isManualAuth(manualCluster)).toBe(true);
-    expect(k8sService.isManualAuth({})).toBe(false);
+    expect(k8sService.isManualAuth({ authMethod: 'manual' })).toBe(false);
+    expect(k8sService.isManualAuth({ accessKeyId: 'key', secretAccessKey: 'secret', sessionToken: 'token' })).toBe(false);
   });
 
   test('call should execute method on API client', async () => {

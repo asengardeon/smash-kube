@@ -26,16 +26,23 @@ export const ClusterModal = ({
             <button 
               type="button"
               onClick={() => setFormData({...formData, authMethod: 'sso'})}
-              className={`flex-1 py-2 text-xs font-medium rounded-md transition-all ${formData.authMethod === 'sso' ? 'bg-accent text-white shadow-lg' : 'text-gray-400 hover:text-gray-200'}`}
+              className={`flex-1 py-2 text-[10px] font-medium rounded-md transition-all ${formData.authMethod === 'sso' ? 'bg-accent text-white shadow-lg' : 'text-gray-400 hover:text-gray-200'}`}
             >
-              AWS SSO (Identity Center)
+              AWS SSO
             </button>
             <button 
               type="button"
               onClick={() => setFormData({...formData, authMethod: 'manual'})}
-              className={`flex-1 py-2 text-xs font-medium rounded-md transition-all ${formData.authMethod === 'manual' ? 'bg-accent text-white shadow-lg' : 'text-gray-400 hover:text-gray-200'}`}
+              className={`flex-1 py-2 text-[10px] font-medium rounded-md transition-all ${formData.authMethod === 'manual' ? 'bg-accent text-white shadow-lg' : 'text-gray-400 hover:text-gray-200'}`}
             >
-              Manual Keys (Access/Secret)
+              Manual Keys
+            </button>
+            <button 
+              type="button"
+              onClick={() => setFormData({...formData, authMethod: 'local'})}
+              className={`flex-1 py-2 text-[10px] font-medium rounded-md transition-all ${formData.authMethod === 'local' ? 'bg-accent text-white shadow-lg' : 'text-gray-400 hover:text-gray-200'}`}
+            >
+              Kubeconfig Local
             </button>
           </div>
 
@@ -126,7 +133,7 @@ export const ClusterModal = ({
                 </div>
               </div>
             </div>
-          ) : (
+          ) : formData.authMethod === 'manual' ? (
             <div className="space-y-4 animate-in fade-in slide-in-from-top-1">
               <div>
                 <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">Cluster Name *</label>
@@ -183,6 +190,33 @@ export const ClusterModal = ({
                     placeholder="Ex: [SEU_SESSION_TOKEN]"
                   />
                 </div>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4 animate-in fade-in slide-in-from-top-1">
+              <div>
+                <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">Nome de Exibição *</label>
+                <input 
+                  required
+                  type="text" 
+                  value={formData.name}
+                  onChange={e => setFormData({...formData, name: e.target.value})}
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:border-accent transition-colors"
+                  placeholder="e.g. Local Context"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">Caminho do Kubeconfig (Opcional)</label>
+                <input 
+                  type="text" 
+                  value={formData.kubeconfigPath || ''}
+                  onChange={e => setFormData({...formData, kubeconfigPath: e.target.value})}
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:border-accent transition-colors text-xs"
+                  placeholder="Ex: /Users/user/.kube/config-custom"
+                />
+                <p className="text-[10px] text-gray-500 mt-2">
+                  Se vazio, será utilizado o caminho padrão <code>~/.kube/config</code>.
+                </p>
               </div>
             </div>
           )}
