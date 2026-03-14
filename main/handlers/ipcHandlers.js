@@ -15,8 +15,12 @@ function registerIpcHandlers() {
     return true;
   });
 
-  ipcMain.handle('list-eks-clusters', async (event, { profile, region }) => {
-    return awsService.listEksClusters(profile, region);
+  ipcMain.handle('list-eks-clusters', async (event, { profile, region, ssoUrl }) => {
+    return awsService.listEksClusters({ profile, region, ssoUrl });
+  });
+
+  ipcMain.handle('list-aws-profiles', async () => {
+    return awsService.listProfiles();
   });
 
   ipcMain.handle('update-kubeconfig', async (event, cluster) => {

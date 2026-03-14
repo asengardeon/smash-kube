@@ -1,5 +1,5 @@
-import React from 'react';
-import { RefreshCw } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { RefreshCw, ChevronDown } from 'lucide-react';
 
 export const ClusterModal = ({ 
   isOpen, 
@@ -12,6 +12,31 @@ export const ClusterModal = ({
   isFetchingClusters, 
   availableClusters 
 }) => {
+  const [awsProfiles, setAwsProfiles] = useState([]);
+  const [isLoadingProfiles, setIsLoadingProfiles] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && formData.authMethod === 'sso') {
+      loadProfiles();
+    }
+  }, [isOpen, formData.authMethod]);
+
+  const loadProfiles = async () => {
+    setIsLoadingProfiles(true);
+    try {
+      const profiles = await window.electron.listAwsProfiles();
+      setAwsProfiles(profiles);
+      // If profile is empty and we have profiles, set the first one as default
+      if (!formData.profile && profiles.length > 0) {
+        setFormData(prev => ({ ...prev, profile: profiles[0] }));
+      }
+    } catch (err) {
+      console.error('Failed to load AWS profiles:', err);
+    } finally {
+      setIsLoadingProfiles(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -28,14 +53,7 @@ export const ClusterModal = ({
               onClick={() => setFormData({...formData, authMethod: 'sso'})}
               className={`flex-1 py-2 text-[10px] font-medium rounded-md transition-all ${formData.authMethod === 'sso' ? 'bg-accent text-white shadow-lg' : 'text-gray-400 hover:text-gray-200'}`}
             >
-              AWS SSO
-            </button>
-            <button 
-              type="button"
-              onClick={() => setFormData({...formData, authMethod: 'manual'})}
-              className={`flex-1 py-2 text-[10px] font-medium rounded-md transition-all ${formData.authMethod === 'manual' ? 'bg-accent text-white shadow-lg' : 'text-gray-400 hover:text-gray-200'}`}
-            >
-              Manual Keys
+              AWS Profile (SSO)
             </button>
             <button 
               type="button"
@@ -62,14 +80,26 @@ export const ClusterModal = ({
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">AWS Profile *</label>
-                  <input 
-                    required
-                    type="text" 
-                    value={formData.profile}
-                    onChange={e => setFormData({...formData, profile: e.target.value})}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:border-accent transition-colors"
-                    placeholder="default"
-                  />
+                  <div className="relative">
+                    <select 
+                      required
+                      value={formData.profile}
+                      onChange={e => setFormData({...formData, profile: e.target.value})}
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:border-accent transition-colors appearance-none cursor-pointer"
+                    >
+                      {awsProfiles.length > 0 ? (
+                        awsProfiles.map(p => <option key={p} value={p}>{p}</option>)
+                      ) : (
+                        <option value={formData.profile || 'default'}>{formData.profile || 'default'}</option>
+                      )}
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-500">
+                      <ChevronDown size={14} />
+                    </div>
+                  </div>
+                  {awsProfiles.length === 0 && !isLoadingProfiles && (
+                    <p className="text-[10px] text-gray-500 mt-1 italic">Nenhum perfil encontrado no ~/.aws/config</p>
+                  )}
                 </div>
               </div>
 
@@ -117,7 +147,7 @@ export const ClusterModal = ({
                       value={formData.ssoUrl}
                       onChange={e => setFormData({...formData, ssoUrl: e.target.value})}
                       className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:border-accent transition-colors"
-                      placeholder="https://atech.awsapps.com/start/#"
+                      placeholder="https://minha-rota-login/start/#"
                     />
                   </div>
                   <div>
@@ -130,65 +160,6 @@ export const ClusterModal = ({
                       placeholder="us-east-1"
                     />
                   </div>
-                </div>
-              </div>
-            </div>
-          ) : formData.authMethod === 'manual' ? (
-            <div className="space-y-4 animate-in fade-in slide-in-from-top-1">
-              <div>
-                <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">Cluster Name *</label>
-                <input 
-                  required
-                  type="text" 
-                  value={formData.name}
-                  onChange={e => setFormData({...formData, name: e.target.value})}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:border-accent transition-colors"
-                  placeholder="e.g. production-cluster"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">AWS Region *</label>
-                <input 
-                  required
-                  type="text" 
-                  value={formData.region}
-                  onChange={e => setFormData({...formData, region: e.target.value})}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:border-accent transition-colors"
-                  placeholder="us-east-1"
-                />
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">Access Key ID *</label>
-                  <input 
-                    required
-                    type="text" 
-                    value={formData.accessKeyId}
-                    onChange={e => setFormData({...formData, accessKeyId: e.target.value})}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:border-accent transition-colors text-xs"
-                    placeholder="Ex: [SUA_ACCESS_KEY_ID]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">Secret Access Key *</label>
-                  <input 
-                    required
-                    type="password" 
-                    value={formData.secretAccessKey}
-                    onChange={e => setFormData({...formData, secretAccessKey: e.target.value})}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:border-accent transition-colors text-xs"
-                    placeholder="Insira a sua Secret key..."
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">Session Token *</label>
-                  <textarea 
-                    required
-                    value={formData.sessionToken}
-                    onChange={e => setFormData({...formData, sessionToken: e.target.value})}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:border-accent transition-colors text-xs h-24 resize-none"
-                    placeholder="Ex: [SEU_SESSION_TOKEN]"
-                  />
                 </div>
               </div>
             </div>
