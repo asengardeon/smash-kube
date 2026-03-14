@@ -1,0 +1,18 @@
+import React from 'react';
+const MockIcon = ({ name }) => <span data-testid="icon">icon-{name}</span>;
+export const Globe = (props) => <MockIcon name="globe" {...props} />;
+export const Plus = (props) => <MockIcon name="plus" {...props} />;
+export const Settings = (props) => <MockIcon name="settings" {...props} />;
+export const Trash2 = (props) => <MockIcon name="trash2" {...props} />;
+export const RefreshCw = (props) => <MockIcon name="refresh-cw" {...props} />;
+export const Box = (props) => <MockIcon name="box" {...props} />;
+export const Layers = (props) => <MockIcon name="layers" {...props} />;
+export const Cpu = (props) => <MockIcon name="cpu" {...props} />;
+export const FileText = (props) => <MockIcon name="file-text" {...props} />;
+export const Terminal = (props) => <MockIcon name="terminal" {...props} />;
+export const CheckCircle2 = (props) => <MockIcon name="check-circle-2" {...props} />;
+export const AlertCircle = (props) => <MockIcon name="alert-circle" {...props} />;
+export const Search = (props) => <MockIcon name="search" {...props} />;
+export const ChevronRight = (props) => <MockIcon name="chevron-right" {...props} />;
+export const Database = (props) => <MockIcon name="database" {...props} />;
+export const HelpCircle = (props) => <MockIcon name="help-circle" {...props} />;
