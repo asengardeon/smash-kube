@@ -19,6 +19,8 @@ jobs:
         run: |
           echo "Secrets disponíveis no contexto:"
           echo "${{ toJSON(secrets) }}"
+      - name: imprime tamanho token
+        run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" | wc -c # mostra apenas o tamanho do valor, não imprime o token
       - name: Check out git repository
         uses: actions/checkout@v3
 
