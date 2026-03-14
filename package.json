@@ -6,7 +6,7 @@
   "scripts": {
     "start": "concurrently \"npm run watch\" \"electron .\"",
     "watch": "webpack --watch --config webpack.config.js",
-    "build": "webpack --config webpack.config.js && electron-builder",
+    "build": "webpack --config webpack.config.js && electron-builder --publish always",
     "compile": "webpack --config webpack.config.js",
     "test": "jest"
   },
@@ -51,6 +51,13 @@
   },
   "build": {
     "appId": "com.smashkube.app",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "smash-kube",
+        "repo": "smash-kube"
+      }
+    ],
     "directories": {
       "output": "dist"
     },
@@ -60,13 +67,16 @@
       "renderer/dist/**/*"
     ],
     "win": {
-      "target": "portable"
+      "target": "portable",
+      "artifactName": "${name}-portable.${ext}"
     },
     "mac": {
-      "target": "dmg"
+      "target": "dmg",
+      "artifactName": "${name}.${ext}"
     },
     "linux": {
-      "target": "AppImage"
+      "target": "AppImage",
+      "artifactName": "${name}.${ext}"
     }
   }
 }
