@@ -8,7 +8,7 @@ Uma interface gráfica (GUI) moderna e intuitiva para visualização e consulta 
 Este é um projeto **Open Source**. Contribuições são muito bem-vindas! Veja o arquivo [CONTRIBUTING.md](CONTRIBUTING.md) para saber como ajudar.
 
 ![Visão Geral do Smash Kube](assets/screenshots/main-view.png)
-*(Sugestão: Adicione aqui uma captura de tela da tela principal)*
+
 
 ## 🎯 Funcionalidades Principais
 
@@ -59,7 +59,7 @@ Utilize a barra lateral para alternar entre as diferentes categorias de recursos
 ### 3. Describe e Logs
 Clique nos ícones de ação para ver detalhes técnicos ou logs em tempo real.
 
-![Describe e Logs](assets/screenshots/describe-logs.png)
+![Describe e Logs](assets/screenshots/describe-pod.png)
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -89,7 +89,19 @@ npm install
 
 # Iniciar em modo de desenvolvimento (Webpack + Electron)
 npm start
+
+# Iniciar em MODO DEMO (Dados fictícios para prints e testes)
+npm run start:demo
 ```
+
+## 🖼️ Modo de Demonstração (DEMO)
+
+O Smash Kube possui um modo especial para demonstrações, treinamentos ou capturas de tela sem a necessidade de uma conexão real com a AWS ou Kubernetes.
+
+Ao executar `npm run start:demo`:
+1. Uma conexão chamada **"demonstracao"** aparecerá automaticamente na barra lateral.
+2. Ao selecionar essa conexão, a aplicação carregará dados fictícios (Pods, Deployments, Nodes, Logs, etc.) instantaneamente.
+3. Nenhuma chamada real será feita à API da AWS ou do Kubernetes, tornando-o seguro para uso em qualquer ambiente.
 
 ## 📦 Build e Distribuição
 

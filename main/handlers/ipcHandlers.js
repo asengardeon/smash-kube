@@ -7,7 +7,24 @@ const store = new Store();
 
 function registerIpcHandlers() {
   ipcMain.handle('get-clusters', () => {
-    return store.get('clusters', []);
+    const clusters = store.get('clusters', []);
+    
+    // --- MODO DEMO: Injetar cluster de demonstração ---
+    if (process.env.DEMO_MODE === 'true') {
+      const demoCluster = {
+        id: 'demo-id-123',
+        name: 'demonstracao',
+        region: 'us-east-1',
+        profile: 'demo-profile',
+        authMethod: 'sso'
+      };
+      // Garantir que o cluster demo apareça na lista se não estiver lá
+      if (!clusters.find(c => c.name === 'demonstracao')) {
+        return [demoCluster, ...clusters];
+      }
+    }
+    
+    return clusters;
   });
 
   ipcMain.handle('save-clusters', (event, clusters) => {

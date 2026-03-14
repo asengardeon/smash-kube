@@ -5,6 +5,7 @@
   "main": "main/index.js",
   "scripts": {
     "start": "concurrently \"npm run watch\" \"electron .\"",
+    "start:demo": "DEMO_MODE=true concurrently \"npm run watch\" \"electron .\"",
     "watch": "webpack --watch --config webpack.config.js",
     "build": "webpack --config webpack.config.js && electron-builder",
     "compile": "webpack --config webpack.config.js",
