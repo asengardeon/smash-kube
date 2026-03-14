@@ -18,7 +18,7 @@ jobs:
       - name: List available secrets (names only)
         run: |
           echo "Secrets disponíveis no contexto:"
-          echo "${{ secrets }}"
+          echo "${{ toJSON(secrets) }}"
       - name: Check out git repository
         uses: actions/checkout@v3
 
