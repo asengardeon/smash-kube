@@ -14,8 +14,7 @@ Este é um projeto **Open Source**. Contribuições são muito bem-vindas! Veja 
 
 - **Gestão de Clusters Local**: Adicione e gerencie múltiplos clusters EKS em uma única interface. As configurações são armazenadas localmente com segurança.
 - **Autenticação Flexível**:
-  - Suporte total a **AWS SSO (IAM Identity Center)** via perfis do AWS CLI.
-  - Suporte a credenciais manuais (Access Key, Secret Key e Session Token) para conexões temporárias.
+  - Suporte total a **AWS SSO (IAM Identity Center)** via seleção automática de perfis do AWS CLI.
   - Suporte a **Kubeconfig Local** (padrão ou caminho customizado).
 - **Visualização de Recursos**:
   - **Workloads**: Pods, Deployments, StatefulSets, DaemonSets, Jobs, CronJobs e HPAs.
@@ -32,19 +31,16 @@ Este é um projeto **Open Source**. Contribuições são muito bem-vindas! Veja 
 ## 📸 Guia de Uso Visual
 
 ### 1. Adicionando um Cluster
-Abra o modal de adição de cluster clicando no botão **"+"** na barra lateral. O Smash Kube oferece três formas de conexão:
+Abra o modal de adição de cluster clicando no botão **"+"** na barra lateral. O Smash Kube oferece duas formas principais de conexão:
 
-#### A. AWS SSO (Recomendado para EKS)
-Ideal para empresas que utilizam o IAM Identity Center.
-- **AWS Profile**: O nome do perfil configurado no seu `~/.aws/config`.
+#### A. AWS Profile (SSO)
+Recomendado para EKS e perfis configurados via AWS CLI.
+- **AWS Profile**: Seleção automática de perfis existentes no seu `~/.aws/config`.
 - **AWS Region**: A região onde o cluster EKS está localizado.
-- **SSO Start URL (Opcional)**: Caso precise disparar o login automático.
+- **Listar clusters**: Botão para buscar automaticamente os clusters disponíveis na conta e região selecionadas.
+- **SSO Start URL (Opcional)**: Caso precise especificar uma URL de login diferente da configurada no perfil.
 
-#### B. Manual Keys (Credenciais Temporárias)
-Útil para sessões rápidas com tokens de curta duração.
-- **Access Key ID**, **Secret Access Key** e **Session Token**.
-
-#### C. Kubeconfig Local
+#### B. Kubeconfig Local
 Permite usar contextos já configurados na sua máquina (EKS, Minikube, Kind, etc).
 - **Caminho do Kubeconfig (Opcional)**: Se deixado em branco, utiliza o padrão `~/.kube/config`. Caso contrário, informe o caminho completo para o arquivo.
 
@@ -106,8 +102,8 @@ Os arquivos gerados estarão na pasta `dist/`.
 
 ## 🔐 Segurança e Privacidade
 
-- **Credenciais**: A aplicação utiliza os perfis de autenticação já configurados na sua máquina via AWS CLI ou chaves temporárias fornecidas por você. Nenhuma credencial AWS é enviada para servidores externos.
-- **Kubeconfig**: O projeto gerencia a atualização automática do contexto do Kubernetes (`~/.kube/config`) para garantir que as chamadas de API sejam sempre autenticadas corretamente.
+- **Credenciais**: A aplicação utiliza os perfis de autenticação já configurados na sua máquina via AWS CLI. Nenhuma credencial AWS é armazenada de forma insegura ou enviada para servidores externos.
+- **Login Automático**: Se sua sessão AWS expirar, o Smash Kube tentará abrir automaticamente o navegador para o login do SSO.
 
 ---
 Desenvolvido com o objetivo de simplificar a observabilidade de clusters Kubernetes.
