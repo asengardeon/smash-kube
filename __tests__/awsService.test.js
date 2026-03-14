@@ -28,6 +28,7 @@ describe('AwsService', () => {
       callback(err, { stdout: '', stderr: 'AccessDenied' });
     });
 
+    // It throws an Error where message is error.stderr || "Falha..."
     await expect(awsService.listEksClusters('my-profile')).rejects.toThrow('AccessDenied');
   });
 });

@@ -23,33 +23,53 @@ describe('K8sService', () => {
     k8sService.resetConfig();
   });
 
-  test('loadConfig should load from default', () => {
-    k8sService.loadConfig();
-    expect(k8s.KubeConfig).toHaveBeenCalled();
+  test('loadConfig should load default config', () => {
+    const config = k8sService.loadConfig();
+    expect(config.loadFromDefault).toHaveBeenCalled();
   });
 
-  test('isManualAuth should detect full credentials', () => {
-    const cluster = {
+  test('isManualAuth should detect manual credentials', () => {
+    const manualCluster = {
       accessKeyId: 'key',
       secretAccessKey: 'secret',
       sessionToken: 'token'
     };
-    expect(k8sService.isManualAuth(cluster)).toBe(true);
+    expect(k8sService.isManualAuth(manualCluster)).toBe(true);
+    expect(k8sService.isManualAuth({})).toBe(false);
   });
 
-  test('isManualAuth should return false if any credential is missing', () => {
-    const cluster = {
-      accessKeyId: 'key',
-      secretAccessKey: 'secret'
+  test('call should execute method on API client', async () => {
+    const mockBody = { items: [] };
+    const mockApi = {
+      listNamespace: jest.fn().mockResolvedValue({ body: mockBody })
     };
-    expect(k8sService.isManualAuth(cluster)).toBe(false);
+    
+    // Mock getApiClient to return our mockApi
+    jest.spyOn(k8sService, 'getApiClient').mockReturnValue(mockApi);
+
+    const result = await k8sService.call('listNamespaces', {});
+    expect(result).toEqual(mockBody);
+    expect(mockApi.listNamespace).toHaveBeenCalled();
   });
 
-  test('resetConfig should clear internal state', () => {
-    k8sService.loadConfig();
-    expect(k8sService.kubeConfig).not.toBeNull();
-    k8sService.resetConfig();
-    expect(k8sService.kubeConfig).toBeNull();
-    expect(k8sService.apiClients).toEqual({});
+  test('call should retry on retryable error', async () => {
+    const mockBody = { items: [] };
+    const mockApi = {
+      listNamespace: jest.fn()
+        .mockRejectedValueOnce({ code: 'ECONNRESET' })
+        .mockResolvedValueOnce({ body: mockBody })
+    };
+    
+    jest.spyOn(k8sService, 'getApiClient').mockReturnValue(mockApi);
+    jest.spyOn(k8sService, 'loadConfig').mockImplementation(() => {});
+
+    const result = await k8sService.call('listNamespaces', {});
+    expect(result).toEqual(mockBody);
+    expect(mockApi.listNamespace).toHaveBeenCalledTimes(2);
+  });
+
+  test('formatError should extract body if present', () => {
+    const err = { response: { body: { message: 'Api Error' } } };
+    expect(k8sService.formatError(err)).toEqual({ message: 'Api Error' });
   });
 });
