@@ -54,7 +54,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "smash-kube",
+        "owner": "asengardeon",
         "repo": "smash-kube"
       }
     ],
