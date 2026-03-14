@@ -15,12 +15,6 @@ jobs:
         os: [macos-latest, ubuntu-latest, windows-latest]
 
     steps:
-      - name: List available secrets (names only)
-        run: |
-          echo "Secrets disponíveis no contexto:"
-          echo "${{ toJSON(secrets) }}"
-      - name: imprime tamanho token
-        run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" | wc -c # mostra apenas o tamanho do valor, não imprime o token
       - name: Check out git repository
         uses: actions/checkout@v3
 
@@ -35,12 +29,17 @@ jobs:
       - name: Build assets
         run: npm run build
 
+      - name: List available secrets (names only)
+        run: |
+          echo "Secrets disponíveis no contexto:"
+          echo "${{ toJSON(secrets) }}"
+
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
         with:
           # GitHub token, automatically provided to the action
           # (No need to define this secret in the repo settings)
-          github_token: ${{ secrets.REPO_TOKEN }}
+          github_token: ${{ secrets.ACTION_REPO }}
 
           # If the commit is tagged with a version (e.g. "v1.0.0"),
           # release the app after building
