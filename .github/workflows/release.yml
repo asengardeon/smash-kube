@@ -15,6 +15,10 @@ jobs:
         os: [macos-latest, ubuntu-latest, windows-latest]
 
     steps:
+      - name: List available secrets (names only)
+        run: |
+          echo "Secrets disponíveis no contexto:"
+          echo "${{ toJSON(secrets) }}" | jq 'keys[]'
       - name: Check out git repository
         uses: actions/checkout@v3
 
