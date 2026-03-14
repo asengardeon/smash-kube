@@ -27,7 +27,7 @@ jobs:
         run: npm install
 
       - name: Build assets
-        run: npm run compile
+        run: npm run build
 
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
