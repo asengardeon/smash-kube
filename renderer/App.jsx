@@ -32,7 +32,7 @@ const App = () => {
   const [clusterModalType, setClusterModalType] = useState('add');
   const [formData, setFormData] = useState({ 
     name: '', region: '', profile: '', ssoUrl: '', ssoRegion: '',
-    authMethod: 'local', accessKeyId: '', secretAccessKey: '', sessionToken: '',
+    authMethod: 'sso',
     kubeconfigPath: ''
   });
   const [editingId, setEditingId] = useState(null);
@@ -47,7 +47,7 @@ const App = () => {
   const resetForm = () => {
     setFormData({ 
       name: '', region: '', profile: '', ssoUrl: '', ssoRegion: '',
-      authMethod: 'local', accessKeyId: '', secretAccessKey: '', sessionToken: '',
+      authMethod: 'sso',
       kubeconfigPath: ''
     });
     setEditingId(null);
@@ -101,7 +101,8 @@ const App = () => {
     try {
       const list = await window.electron.listEksClusters({ 
         profile: formData.profile, 
-        region: formData.region 
+        region: formData.region,
+        ssoUrl: formData.ssoUrl
       });
       setAvailableClusters(list);
     } catch (err) {

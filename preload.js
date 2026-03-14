@@ -6,4 +6,5 @@ contextBridge.exposeInMainWorld('electron', {
   updateKubeconfig: (cluster) => ipcRenderer.invoke('update-kubeconfig', cluster),
   k8sCall: (method, args = {}) => ipcRenderer.invoke('k8s-call', { method, args }),
   listEksClusters: (args) => ipcRenderer.invoke('list-eks-clusters', args),
+  listAwsProfiles: () => ipcRenderer.invoke('list-aws-profiles'),
 });
