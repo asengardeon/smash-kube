@@ -1,121 +1,150 @@
-# Smash Kube 🚀
+# Smash Kube
 
-[![CI](https://github.com/smash-kube/smash-kube/actions/workflows/ci.yml/badge.svg)](https://github.com/smash-kube/smash-kube/actions/workflows/ci.yml)
+> A read-only desktop GUI for Kubernetes clusters — built for Amazon EKS, and it does not need `kubectl`.
+
+[![CI](https://github.com/asengardeon/smash-kube/actions/workflows/ci.yml/badge.svg)](https://github.com/asengardeon/smash-kube/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/asengardeon/smash-kube?include_prereleases)](https://github.com/asengardeon/smash-kube/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Uma interface gráfica (GUI) moderna e intuitiva para visualização e consulta de clusters Kubernetes, com foco especial em ambientes **Amazon EKS**. O projeto foi desenvolvido para facilitar a vida de desenvolvedores e engenheiros de plataforma que precisam de uma visão rápida e detalhada de seus recursos sem a necessidade de comandos complexos no terminal.
+🇧🇷 [Leia em português](README.pt-BR.md)
 
-Este é um projeto **Open Source**. Contribuições são muito bem-vindas! Veja o arquivo [CONTRIBUTING.md](CONTRIBUTING.md) para saber como ajudar.
+Smash Kube gives developers and platform engineers a fast, detailed view of their
+Kubernetes resources without composing terminal commands. It talks to the
+Kubernetes API directly, so **`kubectl` does not need to be installed**, and it is
+**read-only by design** — there is no code path that can delete a resource in
+production.
 
-![Visão Geral do Smash Kube](assets/screenshots/main-view.png)
+![Smash Kube overview](assets/screenshots/main-view.png)
 
+## Download
 
-## 🎯 Funcionalidades Principais
+Grab a build from the [latest release](https://github.com/asengardeon/smash-kube/releases/latest):
 
-- **Gestão de Clusters Local**: Adicione e gerencie múltiplos clusters EKS em uma única interface. As configurações são armazenadas localmente com segurança.
-- **Autenticação Flexível**:
-  - Suporte total a **AWS SSO (IAM Identity Center)** via seleção automática de perfis do AWS CLI.
-  - Suporte a **Kubeconfig Local** (padrão ou caminho customizado).
-- **Visualização de Recursos**:
-  - **Workloads**: Pods, Deployments, StatefulSets, DaemonSets, Jobs, CronJobs e HPAs.
-  - **Rede**: Services, Ingresses e Endpoints.
-  - **Configuração**: ConfigMaps, Secrets e ResourceQuotas.
-  - **Armazenamento**: PersistentVolumes (PV), PersistentVolumeClaims (PVC) e StorageClasses.
-  - **Cluster**: Visão geral de Nodes e Eventos do cluster.
-- **Inspeção Técnica Avançada**:
-  - **Describe Nativo**: Visualização técnica detalhada de qualquer recurso, simulando o comando `kubectl describe` sem a necessidade do binário instalado no sistema.
-  - **Inspeção JSON**: Acesso direto à representação original do objeto no Kubernetes.
-  - **Logs em Tempo Real**: Visualização de logs de Pods com suporte a logs da execução anterior (pre-restart).
-- **Modo Somente Consulta**: A aplicação foi desenhada para ser segura, permitindo apenas a visualização de recursos, eliminando o risco de exclusões acidentais em produção.
+| Platform | File |
+|---|---|
+| Windows | `smash-kube-portable.exe` |
+| Linux | `smash-kube.AppImage` |
+| macOS | `smash-kube.dmg` |
 
-## 📸 Guia de Uso Visual
+No installation step — the Windows build is portable and the Linux build is an
+AppImage.
 
-### 1. Adicionando um Cluster
-Abra o modal de adição de cluster clicando no botão **"+"** na barra lateral. O Smash Kube oferece duas formas principais de conexão:
+## Features
 
-#### A. AWS Profile (SSO)
-Recomendado para EKS e perfis configurados via AWS CLI.
-- **AWS Profile**: Seleção automática de perfis existentes no seu `~/.aws/config`.
-- **AWS Region**: A região onde o cluster EKS está localizado.
-- **Listar clusters**: Botão para buscar automaticamente os clusters disponíveis na conta e região selecionadas.
-- **SSO Start URL (Opcional)**: Caso precise especificar uma URL de login diferente da configurada no perfil.
+**Cluster management** — add and manage multiple EKS clusters in one window.
+Configuration is stored locally.
 
-#### B. Kubeconfig Local
-Permite usar contextos já configurados na sua máquina (EKS, Minikube, Kind, etc).
-- **Caminho do Kubeconfig (Opcional)**: Se deixado em branco, utiliza o padrão `~/.kube/config`. Caso contrário, informe o caminho completo para o arquivo.
+**Flexible authentication**
+- **AWS SSO (IAM Identity Center)** with automatic AWS CLI profile discovery
+- **Local kubeconfig**, default path or a custom one
 
-> **Dica:** Para obter o arquivo de configuração de um cluster EKS via terminal, você pode executar:
+**Resource browsing**
+- **Workloads** — Pods, Deployments, StatefulSets, DaemonSets, Jobs, CronJobs, HPAs
+- **Network** — Services, Ingresses, Endpoints
+- **Configuration** — ConfigMaps, Secrets, ResourceQuotas
+- **Storage** — PersistentVolumes, PersistentVolumeClaims, StorageClasses
+- **Cluster** — Nodes and cluster Events
+
+**Technical inspection**
+- **Native describe** — the detail view of `kubectl describe`, without the binary
+- **Raw JSON** — the original Kubernetes object representation
+- **Live logs** — Pod logs, including the previous container run (pre-restart)
+
+**Read-only mode** — the application only reads. Accidental deletion in production
+is not possible.
+
+## Usage
+
+### Adding a cluster
+
+Click **"+"** in the sidebar. Two connection modes are available:
+
+**A. AWS Profile (SSO)** — recommended for EKS and profiles configured through the
+AWS CLI.
+- **AWS Profile** — picked automatically from your `~/.aws/config`
+- **AWS Region** — where the EKS cluster lives
+- **List clusters** — discovers available clusters in the selected account and region
+- **SSO Start URL** (optional) — if you need a login URL other than the profile's
+
+**B. Local kubeconfig** — uses contexts already on your machine (EKS, Minikube, Kind).
+- **Kubeconfig path** (optional) — defaults to `~/.kube/config`
+
+> To generate a kubeconfig entry for an EKS cluster:
 > ```bash
-> aws eks update-kubeconfig --name <NOME_CLUSTER> --region <REGIAO> --profile <PROFILE>
+> aws eks update-kubeconfig --name <CLUSTER_NAME> --region <REGION> --profile <PROFILE>
 > ```
 
-![Adicionar Cluster](assets/screenshots/add-cluster.png)
+![Add cluster](assets/screenshots/add-cluster.png)
 
-### 2. Navegando pelos Recursos
-Utilize a barra lateral para alternar entre as diferentes categorias de recursos do Kubernetes.
+### Browsing resources
 
-![Navegação](assets/screenshots/navigation.png)
+Use the sidebar to move between Kubernetes resource categories.
 
-### 3. Describe e Logs
-Clique nos ícones de ação para ver detalhes técnicos ou logs em tempo real.
+![Navigation](assets/screenshots/navigation.png)
 
-![Describe e Logs](assets/screenshots/describe-pod.png)
+### Describe and logs
 
-## 🛠️ Tecnologias Utilizadas
+Click the action icons on any resource for technical detail or live logs.
 
-- **Electron**: Framework para aplicação desktop cross-platform.
-- **React**: Interface de usuário reativa e moderna.
-- **Tailwind CSS**: Estilização rápida com foco em design escuro (Dark Mode).
-- **@kubernetes/client-node**: Cliente oficial para comunicação direta com a API do Kubernetes.
-- **Lucide React**: Biblioteca de ícones elegantes.
+![Describe and logs](assets/screenshots/describe-pod.png)
 
-## ✅ Pré-requisitos
+## Requirements
 
-Para utilizar o Smash Kube, você precisará de:
+1. **AWS CLI** installed and configured
+2. Read permissions on the target EKS cluster
+3. **Node.js** — only if you build from source
 
-1.  **AWS CLI** instalado e configurado em sua máquina.
-2.  Permissões de leitura no cluster EKS alvo.
-3.  **Node.js** (apenas se desejar compilar o projeto a partir do código fonte).
+`kubectl` is **not** required.
 
-> **Nota importante:** Diferente de outras ferramentas, o Smash Kube **NÃO exige** o `kubectl` instalado para funcionar, pois utiliza a API nativa do Kubernetes.
+## Built with
 
-## 🚀 Como Executar (Desenvolvimento)
+- **Electron** — cross-platform desktop shell
+- **React** — user interface
+- **Tailwind CSS** — styling, dark-mode first
+- **@kubernetes/client-node** — official client, talks to the Kubernetes API directly
+- **Lucide React** — icons
 
-Se você estiver clonando este repositório para desenvolvimento:
+## Development
 
 ```bash
-# Instalar dependências
+# install dependencies
 npm install
 
-# Iniciar em modo de desenvolvimento (Webpack + Electron)
+# run in development (Webpack + Electron)
 npm start
 
-# Iniciar em MODO DEMO (Dados fictícios para prints e testes)
+# run in DEMO mode (fixture data, no AWS or Kubernetes connection)
 npm run start:demo
 ```
 
-## 🖼️ Modo de Demonstração (DEMO)
+### Demo mode
 
-O Smash Kube possui um modo especial para demonstrações, treinamentos ou capturas de tela sem a necessidade de uma conexão real com a AWS ou Kubernetes.
+`npm run start:demo` adds a connection named **demonstracao** to the sidebar,
+backed by fixture data — Pods, Deployments, Nodes, logs. No call is made to AWS or
+Kubernetes, which makes it safe for demos, training and screenshots in any
+environment.
 
-Ao executar `npm run start:demo`:
-1. Uma conexão chamada **"demonstracao"** aparecerá automaticamente na barra lateral.
-2. Ao selecionar essa conexão, a aplicação carregará dados fictícios (Pods, Deployments, Nodes, Logs, etc.) instantaneamente.
-3. Nenhuma chamada real será feita à API da AWS ou do Kubernetes, tornando-o seguro para uso em qualquer ambiente.
-
-## 📦 Build e Distribuição
-
-Para gerar o executável (dmg, exe ou appimage) para o seu sistema:
+## Build
 
 ```bash
 npm run build
 ```
-Os arquivos gerados estarão na pasta `dist/`.
 
-## 🔐 Segurança e Privacidade
+Artifacts are written to `dist/` (`.exe`, `.AppImage` or `.dmg`, depending on your
+platform).
 
-- **Credenciais**: A aplicação utiliza os perfis de autenticação já configurados na sua máquina via AWS CLI. Nenhuma credencial AWS é armazenada de forma insegura ou enviada para servidores externos.
-- **Login Automático**: Se sua sessão AWS expirar, o Smash Kube tentará abrir automaticamente o navegador para o login do SSO.
+## Security and privacy
 
----
-Desenvolvido com o objetivo de simplificar a observabilidade de clusters Kubernetes.
+- **Credentials** — the app uses the authentication profiles already configured on
+  your machine through the AWS CLI. No AWS credential is stored insecurely or sent
+  to any external server.
+- **Session expiry** — if your AWS session expires, Smash Kube opens the browser
+  for SSO login automatically.
+
+## Contributing
+
+Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
+
+MIT — see [LICENSE](LICENSE).
